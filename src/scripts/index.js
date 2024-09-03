@@ -1,13 +1,14 @@
 import '/src/pages/index.css';  
-import { initialCards, createCard, deleteCard, likeCard } from './cards.js';
-import { openModal, preFill, closeModal, handleFormSubmit, handleFormAddSubmit} from './modal.js';
+import { initialCards } from './cards.js';
+import { createCard, deleteCard, likeCard } from './card.js';
+import { openModal, closeModal, defineAndCloseOpenedPopup } from './modal.js';
 
 //вывод каторчек на экран
-export const cardsContainer = document.querySelector('.places__list');
+const cardsContainer = document.querySelector('.places__list');
 initialCards.forEach(function(item) {
     const cardElement = createCard(item, deleteCard, likeCard, openImagePopup);
     cardsContainer.append(cardElement);
-})
+});
 
 //попапы
 const editPopup = document.querySelector('.popup_type_edit');
@@ -16,11 +17,11 @@ const addPopup = document.querySelector('.popup_type_new-card');
 //кнопки
 const editButton = document.querySelector('.profile__edit-button');
 const addButton = document.querySelector('.profile__add-button');
-const closePopupButton = document.querySelectorAll('.popup__close');
+const closePopupButtons = document.querySelectorAll('.popup__close');
 
 //элементы для работы с формой
 const formEditElement = document.forms['edit-profile'];
-export const formAddElement = document.forms['new-place'];
+const formAddElement = document.forms['new-place'];
 
 const nameInput = formEditElement.querySelector('.popup__input_type_name');
 const jobInput = formEditElement.querySelector('.popup__input_type_description');
@@ -30,38 +31,32 @@ const descriptionDisplay = document.querySelector('.profile__description');
 const placeInput = formAddElement.querySelector('.popup__input_type_card-name');
 const urlCardInput = formAddElement.querySelector('.popup__input_type_url');
 
-export {nameInput, jobInput, nameDisplay, descriptionDisplay};
-export {placeInput, urlCardInput};
-
 //обработчики событий
-document.addEventListener('click', (event) => {
-    if (event.target.classList.contains('popup')) {
-        const openedPopup = document.querySelector('.popup_is-opened');
-        if (openedPopup) {
-            closeModal(openedPopup);
-        }
-        
-    }
-});
-
 editButton.addEventListener('click', () => {openModal(editPopup, preFill)});
 addButton.addEventListener('click', () => {openModal(addPopup)});
 
-closePopupButton.forEach(button => { button.addEventListener('click', closeModal); });
+closePopupButtons.forEach(button => { button.addEventListener('click', closeModal); });
 
-formEditElement.addEventListener('submit', handleFormSubmit); 
+formEditElement.addEventListener('submit', handleProfileForm); 
 formAddElement.addEventListener('submit', handleFormAddSubmit); 
 
-//открытие попапа карточки
+//заполнение по умолчанию
+function preFill() {
+    nameInput.value = nameDisplay.textContent;
+    jobInput.value = descriptionDisplay.textContent;
+}
+
 function preFillImagePopup(imageSrc, imageAlt) {
-    const popupImage = document.querySelector('.popup_type_image .popup__image');
-    const popupCaption = document.querySelector('.popup_type_image .popup__caption');
-  
     popupImage.src = imageSrc;
     popupImage.alt = imageAlt;
     popupCaption.textContent = imageAlt;
   }
   
+
+//открытие попапа карточки
+const popupImage = document.querySelector('.popup_type_image .popup__image');
+const popupCaption = document.querySelector('.popup_type_image .popup__caption');
+
 function openImagePopup(imageSrc, imageAlt) {
     const popupElement = document.querySelector('.popup_type_image');
     function preFill() {
@@ -69,3 +64,30 @@ function openImagePopup(imageSrc, imageAlt) {
     }
     openModal(popupElement, preFill);
   }
+
+
+//обработка кнопок "сохранить" в формах
+function handleProfileForm(event) {
+    event.preventDefault();
+
+    const newName = nameInput.value;
+    const newDescription = jobInput.value;
+    nameDisplay.textContent = newName;
+    descriptionDisplay.textContent = newDescription;
+
+    defineAndCloseOpenedPopup ();
+}
+
+function handleFormAddSubmit(event) {
+    event.preventDefault();
+
+    const cardTitle = placeInput.value;
+    const cardImgUrl = urlCardInput.value;
+
+    const cardData = { name: cardTitle, link: cardImgUrl };
+    const cardElement = createCard(cardData, deleteCard, likeCard, openImagePopup);
+    cardsContainer.prepend(cardElement);
+    formAddElement.reset();     
+
+    defineAndCloseOpenedPopup ();
+}
