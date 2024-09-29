@@ -110,8 +110,12 @@ updateButton.addEventListener("click", () => {
   urlAvatarInput.value = "";
 });
 
+
 closePopupButtons.forEach((button) => {
-  button.addEventListener("click", closeModal);
+  button.addEventListener("click", () => {
+    const openedPopup = document.querySelector(".popup_is-opened");
+    closeModal(openedPopup);
+  });
 });
 
 formEditElement.addEventListener("submit", handleProfileForm);
