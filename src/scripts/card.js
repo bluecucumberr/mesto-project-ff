@@ -13,8 +13,6 @@ export function createCard(
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
   const cardImg = cardElement.querySelector(".card__image");
 
-  cardElement.setAttribute("data-id", cardData._id);
-
   cardImg.src = cardData.link;
   cardElement.querySelector(".card__title").textContent = cardData.name;
   cardImg.alt = cardData.name;
@@ -27,7 +25,7 @@ export function createCard(
     deleteButton.remove();
   } else {
     deleteButton.addEventListener("click", (evt) =>
-      deleteCard(evt, deleteCardFetch)
+      deleteCard(evt, cardData._id, deleteCardFetch)
     );
   }
 
@@ -41,7 +39,7 @@ export function createCard(
   }
 
   likeButton.addEventListener("click", (evt) => {
-    likeCard(evt, likeCardFetch, dislikeCardFetch);
+    likeCard(evt, cardData._id, likeCardFetch, dislikeCardFetch);
   });
 
   cardImg.addEventListener("click", () =>
@@ -51,18 +49,15 @@ export function createCard(
   return cardElement;
 }
 
-export function deleteCard(evt, deleteCardFetch) {
+export function deleteCard(evt, cardId, deleteCardFetch) {
   const cardElement = evt.target.closest(".card");
-  const cardId = cardElement.getAttribute("data-id");
-
   deleteCardFetch(cardId).then(() => {
     cardElement.remove();
   });
 }
 
-export function likeCard(evt, likeCardFetch, dislikeCardFetch) {
+export function likeCard(evt, cardId, likeCardFetch, dislikeCardFetch) {
   const cardElement = evt.target.closest(".card");
-  const cardId = cardElement.getAttribute("data-id");
   const likeButton = evt.target;
   const likeCounter = cardElement.querySelector(".card__like-count");
 
