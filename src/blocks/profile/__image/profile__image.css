@@ -1,4 +1,5 @@
 .profile__image {
+  position: relative;
   width: 120px;
   height: 120px;
   -webkit-border-radius: 50%;
@@ -7,6 +8,37 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+}
+
+
+.profile__image::after {
+  content: "";
+  position: absolute; 
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  opacity: 0; 
+  transition: opacity 0.3s ease; 
+}
+
+.profile__image:hover::after {
+  opacity: 1; 
+}
+
+.edit-icon {
+  background: url('../../../images/avatar-edit-icon.svg') center no-repeat;
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  width: 40px; 
+  height: 40px; 
+  opacity: 0; 
+  transition: opacity 0.3s ease; 
+  z-index: 1;
+}
+
+.profile__image:hover .edit-icon {
+  opacity: 1; /* Показываем иконку при наведении */
 }
 
 @media screen and (max-width: 740px) {
