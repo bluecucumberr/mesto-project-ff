@@ -14,11 +14,7 @@ export const getInitialCards = () => {
     headers: {
       authorization: AUTH_TOKEN,
     },
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при загрузке карточек: ", err);
-    });
+  }).then(handleResponse);
 };
 
 export const getUserData = () => {
@@ -27,11 +23,7 @@ export const getUserData = () => {
     headers: {
       authorization: AUTH_TOKEN,
     },
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при загрузке данных пользователя: ", err);
-    });
+  }).then(handleResponse);
 };
 
 export const patchUser = (name, about) => {
@@ -45,11 +37,7 @@ export const patchUser = (name, about) => {
       name: name,
       about: about,
     }),
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при обновлении профиля: ", err);
-    });
+  }).then(handleResponse);
 };
 
 export const addNewCard = (cardData) => {
@@ -63,24 +51,7 @@ export const addNewCard = (cardData) => {
       name: cardData.name,
       link: cardData.link,
     }),
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при добавлении карточки: ", err);
-    });
-};
-
-export const countLikes = () => {
-  return fetch(PATH + "/cards", {
-    method: "GET",
-    headers: {
-      authorization: AUTH_TOKEN,
-    },
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при подсчете лайков: ", err);
-    });
+  }).then(handleResponse);
 };
 
 export const deleteCardFetch = (cardId) => {
@@ -89,11 +60,7 @@ export const deleteCardFetch = (cardId) => {
     headers: {
       authorization: AUTH_TOKEN,
     },
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при удалении карточки: ", err);
-    });
+  }).then(handleResponse);
 };
 
 export const likeCardFetch = (cardId) => {
@@ -102,11 +69,7 @@ export const likeCardFetch = (cardId) => {
     headers: {
       authorization: AUTH_TOKEN,
     },
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при постановке лайка: ", err);
-    });
+  }).then(handleResponse);
 };
 
 export const dislikeCardFetch = (cardId) => {
@@ -115,11 +78,7 @@ export const dislikeCardFetch = (cardId) => {
     headers: {
       authorization: AUTH_TOKEN,
     },
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при снятии лайка: ", err);
-    });
+  }).then(handleResponse);
 };
 
 export const updateAvatar = (avatarUrl) => {
@@ -130,9 +89,5 @@ export const updateAvatar = (avatarUrl) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ avatar: avatarUrl }),
-  })
-    .then(handleResponse)
-    .catch((err) => {
-      console.log("Ошибка при обновлении аватара: ", err);
-    });
+  }).then(handleResponse);
 };

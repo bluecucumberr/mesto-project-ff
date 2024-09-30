@@ -7,18 +7,19 @@ import {
   getUserData,
   patchUser,
   addNewCard,
-  countLikes,
   deleteCardFetch,
   likeCardFetch,
   dislikeCardFetch,
   updateAvatar,
 } from "./api.js";
 
+let currentUserId;
+
 const cardsContainer = document.querySelector(".places__list");
 // отображение данных профиля и вывод карточек на экран
-Promise.all([getInitialCards(), getUserData()]).then(
-  ([cardsData, userData]) => {
-    const currentUserId = userData._id;
+Promise.all([getInitialCards(), getUserData()])
+  .then(([cardsData, userData]) => {
+    currentUserId = userData._id;
 
     const profileImage = document.querySelector(".profile__image");
     profileImage.style.backgroundImage = `url(${userData.avatar})`;
@@ -41,8 +42,11 @@ Promise.all([getInitialCards(), getUserData()]).then(
       );
       cardsContainer.append(cardElement);
     });
-  }
-);
+    updateLikeCounts(cardsData);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 //попапы
 const editPopup = document.querySelector(".popup_type_edit");
@@ -147,6 +151,9 @@ function handleProfileForm(event) {
     })
     .finally(() => {
       setButtonState(event.submitter, "Сохранить", false);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 
@@ -165,12 +172,19 @@ function handleFormAddSubmit(event) {
         data,
         deleteCard,
         likeCard,
-        openImagePopup
+        openImagePopup,
+        currentUserId,
+        deleteCardFetch,
+        likeCardFetch,
+        dislikeCardFetch
       );
       cardsContainer.prepend(cardElement);
       formAddElement.reset();
 
       defineAndCloseOpenedPopup(addPopup);
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
       setButtonState(event.submitter, "Сохранить", false);
@@ -191,6 +205,9 @@ formUpdateAvatarElenemt.addEventListener("submit", (event) => {
 
       defineAndCloseOpenedPopup(updateAvatarPopup);
     })
+    .catch((err) => {
+      console.log(err);
+    })
     .finally(() => {
       setButtonState(event.submitter, "Сохранить", false);
     });
@@ -204,7 +221,13 @@ function setButtonState(button, text, isDisabled) {
 //Валидация форм
 const clearValidation = (
   formElement,
-  { inputSelector, submitButtonSelector, inputErrorClass, errorClass, inactiveButtonClass }
+  {
+    inputSelector,
+    submitButtonSelector,
+    inputErrorClass,
+    errorClass,
+    inactiveButtonClass,
+  }
 ) => {
   const inputList = Array.from(formElement.querySelectorAll(inputSelector));
   const buttonElement = formElement.querySelector(submitButtonSelector);
@@ -223,11 +246,7 @@ const validationSettings = {
   submitButtonSelector: ".popup__button",
   inactiveButtonClass: "popup__button_inactive",
   inputErrorClass: "popup__input_type_error",
-  errorClass: "popup__input-error"
-}
+  errorClass: "popup__input-error",
+};
 
 enableValidation(validationSettings);
-
-countLikes().then((data) => {
-  updateLikeCounts(data); 
-});

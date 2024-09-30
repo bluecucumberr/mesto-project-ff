@@ -21,6 +21,7 @@ export function createCard(
   likeCounter.textContent = cardData.likes.length;
 
   const deleteButton = cardElement.querySelector(".card__delete-button");
+
   if (cardData.owner._id !== currentUserId) {
     deleteButton.remove();
   } else {
@@ -51,9 +52,13 @@ export function createCard(
 
 export function deleteCard(evt, cardId, deleteCardFetch) {
   const cardElement = evt.target.closest(".card");
-  deleteCardFetch(cardId).then(() => {
-    cardElement.remove();
-  });
+  deleteCardFetch(cardId)
+    .then(() => {
+      cardElement.remove();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 export function likeCard(evt, cardId, likeCardFetch, dislikeCardFetch) {
@@ -62,15 +67,23 @@ export function likeCard(evt, cardId, likeCardFetch, dislikeCardFetch) {
   const likeCounter = cardElement.querySelector(".card__like-count");
 
   if (likeButton.classList.contains("card__like-button_is-active")) {
-    dislikeCardFetch(cardId).then((updatedCard) => {
-      likeButton.classList.remove("card__like-button_is-active");
-      likeCounter.textContent = updatedCard.likes.length;
-    });
+    dislikeCardFetch(cardId)
+      .then((updatedCard) => {
+        likeButton.classList.remove("card__like-button_is-active");
+        likeCounter.textContent = updatedCard.likes.length;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   } else {
-    likeCardFetch(cardId).then((updatedCard) => {
-      likeButton.classList.add("card__like-button_is-active");
-      likeCounter.textContent = updatedCard.likes.length;
-    });
+    likeCardFetch(cardId)
+      .then((updatedCard) => {
+        likeButton.classList.add("card__like-button_is-active");
+        likeCounter.textContent = updatedCard.likes.length;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 
