@@ -73,3 +73,18 @@ export function likeCard(evt, cardId, likeCardFetch, dislikeCardFetch) {
     });
   }
 }
+
+export function updateLikeCounts(data) {
+  const cards = document.querySelectorAll(".card");
+
+  data.forEach((item) => {
+    const cardId = item._id;
+    cards.forEach((card) => {
+      const cardElement = card.closest(".card");
+      if (cardElement && cardElement.cardId === cardId) {
+        const likeCounter = card.querySelector(".card__like-count");
+        likeCounter.textContent = item.likes.length;
+      }
+    });
+  });
+}
