@@ -52,7 +52,7 @@ const addInputErrorClass = (
   formError.classList.add(errorClass);
 };
 
-const removeInputErrorClass = (
+export const removeInputErrorClass = (
   formElement,
   formInput,
   inputErrorClass,

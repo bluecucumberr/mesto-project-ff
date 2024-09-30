@@ -1,7 +1,7 @@
 import "/src/pages/index.css";
 import { createCard, deleteCard, likeCard, updateLikeCounts } from "./card.js";
 import { openModal, closeModal, defineAndCloseOpenedPopup } from "./modal.js";
-import { enableValidation } from "./validation.js";
+import { enableValidation, removeInputErrorClass } from "./validation.js";
 import {
   getInitialCards,
   getUserData,
@@ -14,9 +14,12 @@ import {
   updateAvatar,
 } from "./api.js";
 
-// отображение данных профиля с сервера
-document.addEventListener("DOMContentLoaded", () => {
-  getUserData().then((userData) => {
+const cardsContainer = document.querySelector(".places__list");
+// отображение данных профиля и вывод карточек на экран
+Promise.all([getInitialCards(), getUserData()]).then(
+  ([cardsData, userData]) => {
+    const currentUserId = userData._id;
+
     const profileImage = document.querySelector(".profile__image");
     profileImage.style.backgroundImage = `url(${userData.avatar})`;
 
@@ -24,14 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     descriptionDisplay.textContent = userData.about;
     nameInput.value = userData.name;
     jobInput.value = userData.about;
-  });
-});
-
-//вывод каторчек на экран
-const cardsContainer = document.querySelector(".places__list");
-Promise.all([getInitialCards(), getUserData()]).then(
-  ([cardsData, userData]) => {
-    const currentUserId = userData._id;
 
     cardsData.forEach((item) => {
       const cardElement = createCard(
@@ -83,31 +78,19 @@ const urlAvatarInput = formUpdateAvatarElenemt.querySelector(
 //обработчики событий
 editButton.addEventListener("click", () => {
   openModal(editPopup, preFill);
-  clearValidation(editPopup, {
-    inputSelector: ".popup__input",
-    submitButtonSelector: ".popup__button",
-    inactiveButtonClass: "popup__button_inactive",
-  });
+  clearValidation(editPopup, validationSettings);
 });
 
 addButton.addEventListener("click", () => {
   openModal(addPopup);
-  clearValidation(addPopup, {
-    inputSelector: ".popup__input",
-    submitButtonSelector: ".popup__button",
-    inactiveButtonClass: "popup__button_inactive",
-  });
+  clearValidation(addPopup, validationSettings);
   placeInput.value = "";
   urlCardInput.value = " ";
 });
 
 updateButton.addEventListener("click", () => {
   openModal(updateAvatarPopup);
-  clearValidation(updateAvatarPopup, {
-    inputSelector: ".popup__input",
-    submitButtonSelector: ".popup__button",
-    inactiveButtonClass: "popup__button_inactive",
-  });
+  clearValidation(updateAvatarPopup, validationSettings);
   urlAvatarInput.value = "";
 });
 
@@ -221,32 +204,29 @@ function setButtonState(button, text, isDisabled) {
 //Валидация форм
 const clearValidation = (
   formElement,
-  { inputSelector, submitButtonSelector, inactiveButtonClass }
+  { inputSelector, submitButtonSelector, inputErrorClass, errorClass, inactiveButtonClass }
 ) => {
   const inputList = Array.from(formElement.querySelectorAll(inputSelector));
   const buttonElement = formElement.querySelector(submitButtonSelector);
 
   inputList.forEach((formInput) => {
-    const formError = formElement.querySelector(
-      `.${formInput.name}-input-error`
-    );
-    formInput.classList.remove("popup__input_type_error");
-    formError.textContent = "";
-    formError.classList.remove("popup__input-error");
+    removeInputErrorClass(formElement, formInput, inputErrorClass, errorClass);
   });
 
   buttonElement.disabled = true;
   buttonElement.classList.add(inactiveButtonClass);
 };
 
-enableValidation({
+const validationSettings = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
   inactiveButtonClass: "popup__button_inactive",
   inputErrorClass: "popup__input_type_error",
-  errorClass: "popup__input-error",
-});
+  errorClass: "popup__input-error"
+}
+
+enableValidation(validationSettings);
 
 countLikes().then((data) => {
   updateLikeCounts(data); 
