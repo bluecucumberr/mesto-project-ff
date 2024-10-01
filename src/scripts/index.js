@@ -1,7 +1,7 @@
 import "/src/pages/index.css";
-import { createCard, deleteCard, likeCard, updateLikeCounts } from "./card.js";
-import { openModal, closeModal, defineAndCloseOpenedPopup } from "./modal.js";
-import { enableValidation, removeInputErrorClass } from "./validation.js";
+import { createCard, deleteCard, likeCard } from "./card.js";
+import { openModal, closeModal } from "./modal.js";
+import { validationSettings, enableValidation, clearValidation } from "./validation.js";
 import {
   getInitialCards,
   getUserData,
@@ -16,18 +16,15 @@ import {
 let currentUserId;
 
 const cardsContainer = document.querySelector(".places__list");
+
 // отображение данных профиля и вывод карточек на экран
 Promise.all([getInitialCards(), getUserData()])
   .then(([cardsData, userData]) => {
     currentUserId = userData._id;
-
-    const profileImage = document.querySelector(".profile__image");
-    profileImage.style.backgroundImage = `url(${userData.avatar})`;
+    updateAvatarButton.style.backgroundImage = `url(${userData.avatar})`;
 
     nameDisplay.textContent = userData.name;
     descriptionDisplay.textContent = userData.about;
-    nameInput.value = userData.name;
-    jobInput.value = userData.about;
 
     cardsData.forEach((item) => {
       const cardElement = createCard(
@@ -42,7 +39,6 @@ Promise.all([getInitialCards(), getUserData()])
       );
       cardsContainer.append(cardElement);
     });
-    updateLikeCounts(cardsData);
   })
   .catch((err) => {
     console.log(err);
@@ -58,7 +54,7 @@ const popupImg = document.querySelector(".popup_type_image");
 const editButton = document.querySelector(".profile__edit-button");
 const addButton = document.querySelector(".profile__add-button");
 const closePopupButtons = document.querySelectorAll(".popup__close");
-const updateButton = document.querySelector(".profile__image");
+const updateAvatarButton = document.querySelector(".profile__image");
 
 //элементы для работы с формой
 const formEditElement = document.forms["edit-profile"];
@@ -92,7 +88,7 @@ addButton.addEventListener("click", () => {
   urlCardInput.value = " ";
 });
 
-updateButton.addEventListener("click", () => {
+updateAvatarButton.addEventListener("click", () => {
   openModal(updateAvatarPopup);
   clearValidation(updateAvatarPopup, validationSettings);
   urlAvatarInput.value = "";
@@ -100,7 +96,7 @@ updateButton.addEventListener("click", () => {
 
 closePopupButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const openedPopup = document.querySelector(".popup_is-opened");
+    const openedPopup = button.closest(".popup");
     closeModal(openedPopup);
   });
 });
@@ -146,8 +142,7 @@ function handleProfileForm(event) {
     .then((data) => {
       nameDisplay.textContent = data.name;
       descriptionDisplay.textContent = data.about;
-
-      defineAndCloseOpenedPopup(editPopup);
+      closeModal(event.target.closest(".popup"))
     })
     .finally(() => {
       setButtonState(event.submitter, "Сохранить", false);
@@ -181,7 +176,7 @@ function handleFormAddSubmit(event) {
       cardsContainer.prepend(cardElement);
       formAddElement.reset();
 
-      defineAndCloseOpenedPopup(addPopup);
+      closeModal(event.target.closest(".popup"))
     })
     .catch((err) => {
       console.log(err);
@@ -200,10 +195,9 @@ formUpdateAvatarElenemt.addEventListener("submit", (event) => {
 
   updateAvatar(newAvatarUrl)
     .then((data) => {
-      const profileImage = document.querySelector(".profile__image");
-      profileImage.style.backgroundImage = `url(${data.avatar})`;
+      updateAvatarButton.style.backgroundImage = `url(${data.avatar})`;
 
-      defineAndCloseOpenedPopup(updateAvatarPopup);
+      closeModal(event.target.closest(".popup"))
     })
     .catch((err) => {
       console.log(err);
@@ -219,34 +213,4 @@ function setButtonState(button, text, isDisabled) {
 }
 
 //Валидация форм
-const clearValidation = (
-  formElement,
-  {
-    inputSelector,
-    submitButtonSelector,
-    inputErrorClass,
-    errorClass,
-    inactiveButtonClass,
-  }
-) => {
-  const inputList = Array.from(formElement.querySelectorAll(inputSelector));
-  const buttonElement = formElement.querySelector(submitButtonSelector);
-
-  inputList.forEach((formInput) => {
-    removeInputErrorClass(formElement, formInput, inputErrorClass, errorClass);
-  });
-
-  buttonElement.disabled = true;
-  buttonElement.classList.add(inactiveButtonClass);
-};
-
-const validationSettings = {
-  formSelector: ".popup__form",
-  inputSelector: ".popup__input",
-  submitButtonSelector: ".popup__button",
-  inactiveButtonClass: "popup__button_inactive",
-  inputErrorClass: "popup__input_type_error",
-  errorClass: "popup__input-error",
-};
-
 enableValidation(validationSettings);

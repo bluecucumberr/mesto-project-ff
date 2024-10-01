@@ -1,3 +1,40 @@
+export const validationSettings = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_inactive",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__input-error",
+};
+
+export const clearValidation = (
+  formElement,
+  {
+    inputSelector,
+    submitButtonSelector,
+    inputErrorClass,
+    errorClass,
+    inactiveButtonClass,
+  }
+) => {
+  const inputList = Array.from(formElement.querySelectorAll(inputSelector));
+  const buttonElement = formElement.querySelector(submitButtonSelector);
+
+  inputList.forEach((formInput) => {
+    toggleInputErrorClass(
+      formElement,
+      formInput,
+      "",
+      inputErrorClass,
+      errorClass,
+      false
+    );
+  });
+
+  buttonElement.disabled = true;
+  toggleSaveButton(inputList, buttonElement, inactiveButtonClass);
+};
+
 const setEventListeners = (
   formElement,
   inputSelector,
@@ -26,42 +63,35 @@ const isValidInput = (formElement, formInput, inputErrorClass, errorClass) => {
     formInput.setCustomValidity("");
   }
 
-  if (!formInput.validity.valid) {
-    addInputErrorClass(
-      formElement,
-      formInput,
-      formInput.validationMessage,
-      inputErrorClass,
-      errorClass
-    );
-  } else {
-    removeInputErrorClass(formElement, formInput, inputErrorClass, errorClass);
-  }
+  toggleInputErrorClass(
+    formElement,
+    formInput,
+    formInput.validationMessage,
+    inputErrorClass,
+    errorClass,
+    !formInput.validity.valid 
+  );
 };
 
-const addInputErrorClass = (
+export const toggleInputErrorClass = (
   formElement,
   formInput,
   errorMessage,
   inputErrorClass,
-  errorClass
+  errorClass,
+  addError
 ) => {
   const formError = formElement.querySelector(`.${formInput.name}-input-error`);
-  formInput.classList.add(inputErrorClass);
-  formError.textContent = errorMessage;
-  formError.classList.add(errorClass);
-};
 
-export const removeInputErrorClass = (
-  formElement,
-  formInput,
-  inputErrorClass,
-  errorClass
-) => {
-  const formError = formElement.querySelector(`.${formInput.name}-input-error`);
-  formInput.classList.remove(inputErrorClass);
-  formError.classList.remove(errorClass);
-  formError.textContent = "";
+  if (addError) {
+    formInput.classList.add(inputErrorClass);
+    formError.textContent = errorMessage;
+    formError.classList.add(errorClass);
+  } else {
+    formInput.classList.remove(inputErrorClass);
+    formError.classList.remove(errorClass);
+    formError.textContent = "";
+  }
 };
 
 const toggleSaveButton = (inputList, buttonElement, inactiveButtonClass) => {
