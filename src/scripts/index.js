@@ -1,7 +1,7 @@
 import "/src/pages/index.css";
 import { createCard, deleteCard, likeCard } from "./card.js";
 import { openModal, closeModal } from "./modal.js";
-import { validationSettings, enableValidation, clearValidation } from "./validation.js";
+import { enableValidation, clearValidation, setButtonState } from "./validation.js";
 import {
   getInitialCards,
   getUserData,
@@ -12,6 +12,16 @@ import {
   dislikeCardFetch,
   updateAvatar,
 } from "./api.js";
+
+const validationSettings = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_inactive",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__input-error",
+};
+
 
 let currentUserId;
 
@@ -95,8 +105,8 @@ updateAvatarButton.addEventListener("click", () => {
 });
 
 closePopupButtons.forEach((button) => {
+  const openedPopup = button.closest(".popup");
   button.addEventListener("click", () => {
-    const openedPopup = button.closest(".popup");
     closeModal(openedPopup);
   });
 });
@@ -142,7 +152,7 @@ function handleProfileForm(event) {
     .then((data) => {
       nameDisplay.textContent = data.name;
       descriptionDisplay.textContent = data.about;
-      closeModal(event.target.closest(".popup"))
+      closeModal(editPopup);
     })
     .finally(() => {
       setButtonState(event.submitter, "Сохранить", false);
@@ -176,7 +186,7 @@ function handleFormAddSubmit(event) {
       cardsContainer.prepend(cardElement);
       formAddElement.reset();
 
-      closeModal(event.target.closest(".popup"))
+      closeModal(addPopup);
     })
     .catch((err) => {
       console.log(err);
@@ -197,7 +207,7 @@ formUpdateAvatarElenemt.addEventListener("submit", (event) => {
     .then((data) => {
       updateAvatarButton.style.backgroundImage = `url(${data.avatar})`;
 
-      closeModal(event.target.closest(".popup"))
+      closeModal(addPopup)
     })
     .catch((err) => {
       console.log(err);
@@ -206,11 +216,6 @@ formUpdateAvatarElenemt.addEventListener("submit", (event) => {
       setButtonState(event.submitter, "Сохранить", false);
     });
 });
-
-function setButtonState(button, text, isDisabled) {
-  button.textContent = text;
-  button.disabled = isDisabled;
-}
 
 //Валидация форм
 enableValidation(validationSettings);

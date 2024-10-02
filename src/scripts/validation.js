@@ -1,12 +1,3 @@
-export const validationSettings = {
-  formSelector: ".popup__form",
-  inputSelector: ".popup__input",
-  submitButtonSelector: ".popup__button",
-  inactiveButtonClass: "popup__button_inactive",
-  inputErrorClass: "popup__input_type_error",
-  errorClass: "popup__input-error",
-};
-
 export const clearValidation = (
   formElement,
   {
@@ -31,9 +22,13 @@ export const clearValidation = (
     );
   });
 
-  buttonElement.disabled = true;
   toggleSaveButton(inputList, buttonElement, inactiveButtonClass);
 };
+
+export const setButtonState = (button, text, isDisabled) => {
+  button.textContent = text;
+  button.disabled = isDisabled;
+}
 
 const setEventListeners = (
   formElement,
